@@ -62,15 +62,12 @@ exports.remove = (req, res) => {
 exports.update = (req,res) => {
     const { id } = req.params
     const { active, lineName } = req.body
-    console.log(active);
-    mqttMsg(id, active);
     Home.findOneAndUpdate({id}, {isActive: !active, userActive: lineName})
     .exec((err, home) => {
         if(err) console.log(err)
-        // console.log(home);
         res.status(200).json(home)
-        console.log(id, active);
     })
+    mqttMsg(id, active);
 }
 
 function mqttMsg(id, active) {
@@ -84,10 +81,7 @@ function mqttMsg(id, active) {
         return clientMqtt.publish(process.env.SUB_TOPIC_LAMP, process.env.PUB_OFF_pHome)
     } else if(id == 3 && active == true) {
         clientMqtt.publish(process.env.SUB_TOPIC_DOOR, process.env.PUB_ON_DOOR)
-        // clientMqtt.publish(subTopic, '/State-Off')
     } else if (id == 3 && active == false) {
         clientMqtt.publish(process.env.SUB_TOPIC_DOOR, process.env.PUB_OFF_DOOR)
-        // clientMqtt.publish(subTopic, '/State-On')
     }
 }
-// DATABASE=mongodb+srv://tatonq:zgshxGgoGJ9ZAAnM@hometatonq.pij1x6w.mongodb.net/?retryWrites=true&w=majority
