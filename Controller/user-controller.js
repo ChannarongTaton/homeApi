@@ -12,9 +12,9 @@ const config = {
 const lineBot = new line.Client(config);
 
 exports.create = (req, res) => {
-    const { nickName, userId, displayName, pictureUrl, userStatus } = req.body
+    const { nickName, userId, lineName, pictureUrl, userStatus } = req.body
     console.log(req.body);
-    User.create({nickName, userId, displayName, pictureUrl, userStatus },
+    User.create({nickName, userId, lineName, pictureUrl, userStatus },
         (err, user) => {
             if (err) res.status(400).json({message: "มีบางอย่างผิดพลาด"})
             res.status(200).json(user)
