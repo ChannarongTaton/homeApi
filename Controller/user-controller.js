@@ -12,15 +12,13 @@ const config = {
 const lineBot = new line.Client(config);
 
 exports.create = (req, res) => {
-
-    const { nickName, userId, displayName, pictureUtl, userStatus } = req.body
-
-    User.create({nickName, userId, displayName, pictureUtl, userStatus },
+    const { nickName, userId, displayName, pictureUrl, userStatus } = req.body
+    console.log(req.body);
+    User.create({nickName, userId, displayName, pictureUrl, userStatus },
         (err, user) => {
             if (err) res.status(400).json({message: "มีบางอย่างผิดพลาด"})
-            lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
             res.status(200).json(user)
-            
+            lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
     })
 }
 
