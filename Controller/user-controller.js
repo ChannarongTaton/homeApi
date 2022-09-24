@@ -17,8 +17,8 @@ exports.create = (req, res) => {
         (err, user) => {
             if (err) res.status(400).json({message: "มีบางอย่างผิดพลาด"})
             res.status(200).json(user)
-            lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
     })
+    lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
 }
 
 exports.getAllUsers = (req, res) => {
