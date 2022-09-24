@@ -26,7 +26,8 @@ exports.create = (req, res) => {
 
 exports.getAllUsers = (req, res) => {
     User.find({}).exec((err, user) => {
-        res.json(home)
+        if(err) return res.status(400).json({message:"ไม่เจอข้อมูลลูกบ้าน สงสัยมีอะไรผิดตรงนี้"})
+        res.json(user)
     })
 }
 
