@@ -50,8 +50,10 @@ exports.update = (req, res) => {
     const { userStatus } = req.body
     if(userStatus === 'wait') {
         userStatus === 'Active'
+        console.log(userStatus);
     } else {
         userStatus === "loading"
+        console.log(userStatus);
     }
     User.findOneAndUpdate({userId}, {userStatus: userStatus}, {new:true})
     .exec((err, user) => {
