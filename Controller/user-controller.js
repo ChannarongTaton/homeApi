@@ -70,23 +70,23 @@ exports.updateLoad = (req, res) => {
 //บ้าน 99
 exports.linkRichMenuToMyHome = (req, res) => {
     const { userId } = req.params
-    User.findOneAndUpdate({userId: userId}, {userStatus: "บ้านตาต้น"})
+    User.findOneAndUpdate({userId: userId}, {userStatus: "99"})
     .exec((err, user) => {
         if (err) res.status(400).json({message: err})
-        lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_CONT99)
         res.json(user)
     })
+    lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_CONT99)
 }
 
 // บ้าน 99/1
 exports.linkRichMenuToMy99_1 = (req, res) => {
     const { userId } = req.params
-    User.findOneAndUpdate({userId: userId}, {userStatus: "บ้านตาต้น"})
+    User.findOneAndUpdate({userId: userId}, {userStatus: "99/1"})
     .exec((err, user) => {
         if (err) res.status(400).json({message: err})
-        lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_CONT99_1)
         res.json(user)
     })
+    lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_CONT99_1)
 }
 
 //กลับไปหน้า Rich-Menu รอ
