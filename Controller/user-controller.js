@@ -48,10 +48,10 @@ exports.remove = (req, res) => {
 exports.update = (req, res) => {
     const { userId } = req.params
     const { userStatus } = req.body
-    if(userStatus == 'wait') {
-        userStatus == 'Active'
+    if(userStatus === 'wait') {
+        userStatus === 'Active'
     } else {
-        userStatus == "loading"
+        userStatus === "loading"
     }
     User.findOneAndUpdate({userId}, {userStatus}, {new:true})
     .exec((err, user) => {
