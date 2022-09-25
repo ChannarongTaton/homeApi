@@ -53,7 +53,7 @@ exports.update = (req, res) => {
     } else {
         userStatus === "loading"
     }
-    User.findOneAndUpdate({userId}, {userStatus}, {new:true})
+    User.findOneAndUpdate({userId}, {userStatus: userStatus}, {new:true})
     .exec((err, user) => {
         if(err) res.status(400).json({message: "ลืมใส่ข้อมูล"})
         res.json(user)
