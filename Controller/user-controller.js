@@ -45,16 +45,21 @@ exports.remove = (req, res) => {
     })
 }
 
-exports.update = (req, res) => {
+exports.updateActive = (req, res) => {
     const { userId } = req.params
     const { userStatus } = req.body
-    if(userStatus === 'wait') {
-        userStatus === 'Active'
-        console.log(userStatus);
-    } else {
-        userStatus === "loading"
-        console.log(userStatus);
-    }
+    console.log(req.body);
+    User.findOneAndUpdate({userId}, {userStatus: userStatus}, {new:true})
+    .exec((err, user) => {
+        if(err) res.status(400).json({message: "ลืมใส่ข้อมูล"})
+        res.json(user)
+    })
+}
+
+exports.updateLoad = (req, res) => {
+    const { userId } = req.params
+    const { userStatus } = req.body
+    console.log(req.body);
     User.findOneAndUpdate({userId}, {userStatus: userStatus}, {new:true})
     .exec((err, user) => {
         if(err) res.status(400).json({message: "ลืมใส่ข้อมูล"})
