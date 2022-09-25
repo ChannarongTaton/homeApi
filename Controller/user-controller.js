@@ -47,10 +47,15 @@ exports.remove = (req, res) => {
 
 exports.update = (req, res) => {
     const { userId } = req.params
-    const { nickName } = req.body
-    User.findByIdAndUpdate({userId}, {nickName}, {new:true})
+    const { userStatus } = req.body
+    if(userStatus == 'wait') {
+        userStatus == 'Active'
+    } else {
+        userStatus == "loading"
+    }
+    User.findOneAndUpdate({userId}, {userStatus}, {new:true})
     .exec((err, user) => {
-        if(err) res.status(400).json({message: err})
+        if(err) res.status(400).json({message: "ลืมใส่ข้อมูล"})
         res.json(user)
     })
 }
