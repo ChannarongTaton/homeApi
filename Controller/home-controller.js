@@ -3,6 +3,8 @@ const slugify = require('slugify')
 const Home = require("../models/home")
 const { v4 : uuidv4 } = require('uuid')
 const mqtt = require('mqtt')
+const request = require('request');
+const { default: axios } = require('axios')
 require('dotenv').config()
 
 const clientMqtt = mqtt.connect({
@@ -10,7 +12,7 @@ const clientMqtt = mqtt.connect({
     port: 1883,
 })
 
-
+const url_line_notification = "https://notify-api.line.me/api/notify";
 
 exports.create = (req, res) => {
     const {id, name, activeWhen, userActive, isActive} = req.body
@@ -62,6 +64,26 @@ exports.remove = (req, res) => {
 exports.update = (req,res) => {
     const { id } = req.params
     const { active, lineName } = req.body
+    request({
+        method: 'POST',
+        uri: url_line_notification,
+        header: {
+            'Content-Type': 'multipart/form-data',
+        },
+        auth: {
+            bearer: process.env.LINE_TOKEN,
+        },
+        form: {
+            message: ` ${lineName} สั่งทำงานอุปกรณ์`
+        },
+    }, (err, httpResponse, body) => {
+        if (err) {
+            console.log(JSON.stringify(err))
+        } else {
+            console.log(JSON.stringify(httpResponse))
+            console.log(JSON.stringify(body))
+        }
+    });
     Home.findOneAndUpdate({id}, {isActive: !active, userActive: lineName})
     .exec((err, home) => {
         if(err) console.log(err)
