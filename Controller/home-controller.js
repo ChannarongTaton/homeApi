@@ -4,7 +4,6 @@ const Home = require("../models/home")
 const { v4 : uuidv4 } = require('uuid')
 const mqtt = require('mqtt')
 const request = require('request');
-const { default: axios } = require('axios')
 require('dotenv').config()
 
 const clientMqtt = mqtt.connect({
@@ -64,6 +63,12 @@ exports.remove = (req, res) => {
 exports.update = (req,res) => {
     const { id } = req.params
     const { active, lineName } = req.body
+    Home.findOneAndUpdate({id}, {isActive: !active, userActive: lineName})
+    .exec((err, home) => {
+        if(err) console.log(err)
+        res.status(200).json(home)
+    })
+    mqttMsg(id, active);
     request({
         method: 'POST',
         uri: url_line_notification,
@@ -74,22 +79,15 @@ exports.update = (req,res) => {
             bearer: process.env.LINE_TOKEN,
         },
         form: {
-            message: ` ${lineName} สั่งทำงานอุปกรณ์`
+            message: ` ${lineName} สั่งทำงานอุปกรณ์ ${id}`
         },
     }, (err, httpResponse, body) => {
         if (err) {
             console.log(JSON.stringify(err))
         } else {
-            console.log(JSON.stringify(httpResponse))
             console.log(JSON.stringify(body))
         }
     });
-    Home.findOneAndUpdate({id}, {isActive: !active, userActive: lineName})
-    .exec((err, home) => {
-        if(err) console.log(err)
-        res.status(200).json(home)
-    })
-    mqttMsg(id, active);
 }
 
 function mqttMsg(id, active) {
