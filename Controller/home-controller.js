@@ -4,12 +4,26 @@ const Home = require("../models/home")
 const { v4 : uuidv4 } = require('uuid')
 const mqtt = require('mqtt')
 const request = require('request');
+const line = require('@line/bot-sdk');
+const { default: axios } = require('axios');
 require('dotenv').config()
+
+// LineOA
+const config = {
+    channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
+    channelSecret: process.env.CHANNEL_SECRET,
+}
+const lineBot = new line.Client(config); //เรียกใช้งาน lineBot ผ่านค่า config เข้าไป
 
 const clientMqtt = mqtt.connect({
     host: process.env.HOSTMQTT_DOOR,
     port: 1883,
 })
+
+const LINE_HEADER = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.CHANNEL_ACCESS_TOKEN}` 
+};
 
 const url_line_notification = "https://notify-api.line.me/api/notify";
 
@@ -62,7 +76,8 @@ exports.remove = (req, res) => {
 
 exports.update = (req,res) => {
     const { id } = req.params
-    const { active, lineName } = req.body
+    const { active, lineName, homeName } = req.body
+    console.log(req.body)
     Home.findOneAndUpdate({id}, {isActive: !active, userActive: lineName})
     .exec((err, home) => {
         if(err) console.log(err)
@@ -71,23 +86,18 @@ exports.update = (req,res) => {
     mqttMsg(id, active);
     request({
         method: 'POST',
-        uri: url_line_notification,
-        header: {
-            'Content-Type': 'multipart/form-data',
-        },
-        auth: {
-            bearer: process.env.LINE_TOKEN,
-        },
-        form: {
-            message: ` ${lineName} สั่งทำงานอุปกรณ์ ${id}`
-        },
-    }, (err, httpResponse, body) => {
-        if (err) {
-            console.log(JSON.stringify(err))
-        } else {
-            console.log(JSON.stringify(body))
-        }
-    });
+        uri: `${process.env.LINE_MESSAGING_API}/push`,
+        headers: LINE_HEADER,
+        body: JSON.stringify({
+            to: `${process.env.LINE_USERID}`,
+            messages: [
+                {
+                    type: "text",
+                    text: `${lineName} สั่งทำงานอุปกรณ์ ${homeName}`,
+                }
+            ]
+        })
+    })
 }
 
 function mqttMsg(id, active) {
