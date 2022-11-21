@@ -35,6 +35,29 @@ exports.getUser = (req, res) => {
     })
 }
 
+exports.updateUserProfile = (req, res) => {
+    const { userId } = req.params
+    axios({
+        method: 'get',
+        url: `https://api.line.me/v2/bot/profile/${userId}`,
+        headers: {
+            Authorization: `Bearer ${process.env.CHANNEL_ACCESS_TOKEN}`
+        }
+    })
+    .then(response => {
+        const {displayName, pictureUrl} = response.data
+        console.log(response.data)
+        User.findOneAndUpdate({userId}, {displayName: displayName, pictureUrl: pictureUrl}, {new:true})
+        .exec((err, user) => {
+            if(err) res.status(400).json({message: "มีบางอย่างผิดปกติตอนดึงข้อมูล"})
+            res.json(user)
+        })
+    })
+    .catch(err => {
+        console.log(err)
+    })
+}
+
 exports.remove = (req, res) => {
     const { userId } = req.params
     User.findByIdAndDelete({userId}).exec((err, user) => {
