@@ -45,7 +45,7 @@ exports.create = (req, res) => {
         if (err) {
             res.status(400).json({error: "มีชื่อหมายเลขซ้ำกัน"})
         }
-        res.json(home)
+        return res.status(201).json({message: "สร้างอุปกรณ์เสร็จสิ้น"})
     })
 }
 
@@ -53,14 +53,15 @@ exports.create = (req, res) => {
 exports.getAllItems = (req, res) => {
     Home.find({}).exec((err, home) => {
         if(err) return res.status(400).json({message:"ไม่เจออุปกรณ์ สงสัยมีอะไรผิดตรงนี้"})
-        res.json(home)
+        return res.json(home)
     })
 }
 
 exports.getItem = (req, res) => {
     const { id } = req.params;
     Home.findOne({id}).exec((err, home) => {
-        if (err) res.status(400).json({message: `เหมือนว่าจะหา ${id} ไม่เจอนะ`})
+        if (err) return res.status(400).json({message: `เหมือนว่าจะหา ${id} ไม่เจอนะ`})
+        if (home === null) return res.status(400).json({message: `เหมือนว่าจะหา ${id} ไม่เจอนะ`})
         res.json(home)
     })
 }

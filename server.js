@@ -5,7 +5,8 @@ const mongoose = require("mongoose")
 require('dotenv').config()
 const homeRoute = require('./routes/home')
 const userRoute = require('./routes/user')
-const { default: axios } = require("axios")
+const axios = require("axios")
+const jwt = require('jsonwebtoken')
 const app = express()
 
 //connect local database
@@ -15,13 +16,27 @@ mongoose.connect(process.env.DATABASE, {
 }).then(() => console.log('Connected to Database'))
 .catch((err) => console.log(err))
 
+let playload = {
+    name : "Channarong",
+    occupation : "Engineeer",
+    age : 14,
+}
+
 //middleware
 app.use(express.json())
 app.use(cors())
 app.use(morgan("dev"))
 
-app.get('/a', (req, res) => {
-    res.send("HELLO")
+app.get('/json', (req, res) => {
+    const token = jwt.sign(playload, process.env.MY_KEY, {expiresIn: 60*5})
+    console.log(token);
+    try{
+        const dataInToken = jwt.verify(token, process.env.MY_KEY);
+        console.log(dataInToken);
+        res.json({token: dataInToken})
+    } catch (err) {
+        console.log(err);
+    }
 })
 
 app.get('/1', (req, res) => {
@@ -42,7 +57,7 @@ app.get('/1', (req, res) => {
 
 //route
 app.use("/api", homeRoute)
-app.use("/userApi", userRoute)
+app.use("/api/user", userRoute)
 
 const port = process.env.PORT || 8080
 app.listen(port, () => {
