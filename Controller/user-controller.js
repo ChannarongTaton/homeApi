@@ -17,8 +17,8 @@ const LINE_HEADER = {
 const lineBot = new line.Client(config);
 //บันทึกข้อมูลของสมาชิกลงฐานข้อมูล แล้วลิ้งค์ริชเมนูให้รอการยืนยันจากระบบไปแก้ ผู้สมัคร
 exports.create = (req, res) => {
-    const { nickName, userId, displayName, pictureUrl, userStatus } = req.body
     if(!req.body) return res.status(500).json({ErrorMessage: "ไม่มีข้อมูล"})
+    const { nickName, userId, displayName, pictureUrl, userStatus } = req.body
     lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
     .then(response => {
         return response.data
@@ -110,6 +110,11 @@ exports.updateUserProfile = (req, res) => {
 //ลบข้อมูลผู้ใช้โดยอ้างอิงจาก userId
 exports.remove = (req, res) => {
     const { userId } = req.params
+    if (userId === process.env.LINE_USERID) {
+        return res.status(400).json({
+            error: "ไม่สามารถลบเทพต้นได้"
+        })
+    }
     User.findByIdAndDelete({userId}).exec((err, user) => {
         if (err) res.status(400).json({
             message: err
