@@ -4,15 +4,28 @@ const User = require("../models/user")
 const axios = require('axios')
 const line = require('@line/bot-sdk')
 const jwt = require("jsonwebtoken");
+const request = require('request');
 const config = {
     channelAccessToken: process.env.CHANNEL_ACCESS_TOKEN,
     channelSecret: process.env.CHANNEL_SECRET,
 }
+const LINE_HEADER = {
+    'Content-Type': 'application/json',
+    'Authorization': `Bearer ${process.env.CHANNEL_ACCESS_TOKEN}` 
+};
 //สร้างตัวแปรรับคลาสจาก ไรบราลี่
 const lineBot = new line.Client(config);
 //บันทึกข้อมูลของสมาชิกลงฐานข้อมูล แล้วลิ้งค์ริชเมนูให้รอการยืนยันจากระบบไปแก้ ผู้สมัคร
 exports.create = (req, res) => {
     const { nickName, userId, displayName, pictureUrl, userStatus } = req.body
+    if(!req.body) return res.status(500).json({ErrorMessage: "ไม่มีข้อมูล"})
+    lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
+    .then(response => {
+        return response.data
+    })
+    .catch(err => {
+        return res.status(500).json({ErrorMessage: "ลิงค์ข้อมูล RichMenu ไม่สำเร็จตอนสมัครสมาชิก"})
+    })
     User.create({nickName, userId, displayName, pictureUrl, userStatus },
         (err, user) => {
             if (err) res.status(400).json({
@@ -22,7 +35,21 @@ exports.create = (req, res) => {
                 message: `สร้างข้อมูล ${userId} เรียบร้อย`
             })
         })
-    lineBot.linkRichMenuToUser(userId, process.env.RICH_MENU_W8)
+
+    request({
+        method: 'POST',
+        uri: `${process.env.LINE_MESSAGING_API}/push`,
+        headers: LINE_HEADER,
+        body: JSON.stringify({
+            to: `${process.env.LINE_USERID}`,
+            messages: [
+                {
+                    type: "text",
+                    text: `${nickName} สมัครสมาชิกเป็นลูกบ้านใหม่`,
+                }
+            ]
+        })
+    })
 }
 //เรียกใช้ข้อมูลผู้ใช้จากฐานข้อมูลทั้งหมด
 exports.getAllUsers = (req, res) => {
