@@ -85,20 +85,20 @@ exports.update = (req,res) => {
         res.status(200).json(home)
     })
     mqttMsg(id, active);
-    request({
-        method: 'POST',
-        uri: `${process.env.LINE_MESSAGING_API}/push`,
-        headers: LINE_HEADER,
-        body: JSON.stringify({
-            to: `${process.env.LINE_USERID}`,
-            messages: [
-                {
-                    type: "text",
-                    text: `${lineName} สั่งทำงานอุปกรณ์ ${homeName}`,
-                }
-            ]
-        })
-    })
+    // request({
+    //     method: 'POST',
+    //     uri: `${process.env.LINE_MESSAGING_API}/push`,
+    //     headers: LINE_HEADER,
+    //     body: JSON.stringify({
+    //         to: `${process.env.LINE_USERID}`,
+    //         messages: [
+    //             {
+    //                 type: "text",
+    //                 text: `${lineName} สั่งทำงานอุปกรณ์ ${homeName}`,
+    //             }
+    //         ]
+    //     })
+    // })
 }
 
 function mqttMsg(id, active) {
